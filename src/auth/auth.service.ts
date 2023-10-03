@@ -40,7 +40,7 @@ export class AuthService {
   async singIn(loginUserDto: LoginUserDto) {
     try {
       const user = await this.findOne(loginUserDto.email);
-      if (!user || !this.verifyPassword(loginUserDto.password, user.password)) throw new BadRequestException('email or password are not valid');
+      if (!user || !this.verifyPassword(loginUserDto.password, user.password)) throw new BadRequestException('Email or password are not valid');
       return {
         user,
         token: this.generateJWT({ id: user.id })
@@ -57,7 +57,7 @@ export class AuthService {
     }
   }
 
-  async createNewPassword(changePassowrdUserDto: ChangePasswordUserDto, { _id, password }: User) {
+  async createNewPassword( changePassowrdUserDto: ChangePasswordUserDto, { _id, password }: User ) {
     const { currentPassword, newPassword } = changePassowrdUserDto;
 
     if (! this.verifyPassword(currentPassword, password) ) throw new BadRequestException('Invalid password - Verify your current password');
@@ -67,7 +67,7 @@ export class AuthService {
     return await this.updateOne<String, UpdatePassword>(_id, { password: this.getHashPassword(newPassword) });
   }
 
-  private async findOne(email: string) {
+  private async findOne(email: String) {
     try {
       return await this.userModel.findOne({ email });
     } catch (error) {

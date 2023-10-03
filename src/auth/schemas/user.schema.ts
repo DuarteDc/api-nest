@@ -19,7 +19,7 @@ export class User {
         type: String,
         required: true,
     })
-    last_name: string;
+    lastName: string;
 
     @Prop({
         type: String,
@@ -37,7 +37,7 @@ export class User {
         type: [{ type: SchemaModel.Types.ObjectId, ref: 'Tags' }],
         default: []
     })
-    tgas: Array<String>
+    tags: Array<String>
 
     @Prop({    
         type: Boolean,

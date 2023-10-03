@@ -7,6 +7,7 @@ async function bootstrap() {
 
   const logger = new Logger;
   
+  app.setGlobalPrefix('api');
 
   app.useGlobalPipes(
     new ValidationPipe({

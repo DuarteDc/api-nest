@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 
 import { EnvConfiguration } from './config/env.config';
 import { userPreSave, userGetWithOutPassword } from './auth/hooks/';
+import { ProductsModule } from './products/products.module';
+import { createProductSlug } from './products/hooks/create-product-slug.hook';
 
 @Module({
   imports: [ 
@@ -16,10 +18,12 @@ import { userPreSave, userGetWithOutPassword } from './auth/hooks/';
     MongooseModule.forRoot(process.env.MONGODB_URI),
     MongooseModule.forFeatureAsync([
       userPreSave(),
-      userGetWithOutPassword()
+      userGetWithOutPassword(),
+      createProductSlug(),
     ]),
 
-    AuthModule
+    AuthModule,
+    ProductsModule
   ],
 })
 

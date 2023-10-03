@@ -29,7 +29,7 @@ export class AuthController {
     return this.authService.checkAuthentication(user)
   }
 
-  @Get('change-password')
+  @Post('change-password')
   @UseGuards(AuthGuard())
   changePassword( @Body() changePassowrdUserDto: ChangePasswordUserDto, @GetUser() user: User ) {
     return this.authService.createNewPassword( changePassowrdUserDto, user )
