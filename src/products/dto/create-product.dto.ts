@@ -1,4 +1,4 @@
-import { IsNumber, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateProductDto {
 
@@ -6,6 +6,8 @@ export class CreateProductDto {
     @MinLength(2)
     name: string;
 
+    @IsOptional()
+    @IsString()
     slug?: string;
 
     @IsNumber()
@@ -13,5 +15,9 @@ export class CreateProductDto {
 
     @IsNumber()
     stock: Number;
+
+    @IsOptional()
+    @IsBoolean()
+    status: Boolean;
 
 }

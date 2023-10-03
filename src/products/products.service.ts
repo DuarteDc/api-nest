@@ -1,35 +1,68 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { PaginateModel } from 'mongoose';
+import { PaginateModel, isValidObjectId } from 'mongoose';
 
 import { Product } from './schemas/product.schema';
 
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 @Injectable()
 export class ProductsService {
 
   constructor(@InjectModel(Product.name) private readonly productModel: PaginateModel<Product>) { }
 
   async create(createProductDto: CreateProductDto) {
-    return await this.productModel.create(createProductDto)
+    try {
+      return await this.productModel.create(createProductDto);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  findAll() {
-    return this.productModel.paginate({})
+  async findAll(paginationDto: PaginationDto) {
+    try {
+      const options = JSON.parse(JSON.stringify(paginationDto));
+      return await this.productModel.paginate({ status: true }, options)
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(query: string) {
+    try {
+      let product: Product;
+      if (isValidObjectId(query))
+        product = await this.productModel.findById(query);
+      else
+        product = await this.productModel.findOne({ slug: query });
+
+      if (!product) throw new NotFoundException(`${query} not found`)
+
+      return product;
+
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  update(id: string, updateProductDto: UpdateProductDto) {
+    return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    try {
+      return await this.update(id, { status: false });
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  private handleError(error: any) {
+    if (error.code === 11000) throw new BadRequestException(`Pokemon with ${JSON.stringify(error.keyValue)} has already exist`);
+
+    if (error instanceof HttpException) throw error;
+    throw new InternalServerErrorException('Check server logs')
   }
 }

@@ -35,6 +35,13 @@ export class Product {
         default: 0
      })
      stock: Number;
+
+     @Prop({
+        type: Boolean,
+        default: true,
+     })
+     status: Boolean;
+
 }
 
 
