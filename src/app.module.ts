@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import { AsyncModelFactory, MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 
 import { EnvConfiguration } from './config/env.config';
-import { userPreSave, userGetWithOutPassword } from './auth/hooks/';
+
+import { getMongoHooks } from './common/hooks/common.hook'
 import { ProductsModule } from './products/products.module';
-import { createProductSlug, updateProductSlug } from './products/hooks/';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
+
   imports: [ 
 
     ConfigModule.forRoot({
@@ -16,16 +18,15 @@ import { createProductSlug, updateProductSlug } from './products/hooks/';
     }),
 
     MongooseModule.forRoot(process.env.MONGODB_URI),
-    MongooseModule.forFeatureAsync([
-      userPreSave(),
-      userGetWithOutPassword(),
-      createProductSlug(),
-      updateProductSlug(),
-    ]),
+    MongooseModule.forFeatureAsync(getMongoHooks()),  
 
+    
     AuthModule,
-    ProductsModule
+    ProductsModule,
+    CategoriesModule
   ],
 })
+
+
 
 export class AppModule {}

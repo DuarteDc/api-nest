@@ -71,7 +71,7 @@ export class ProductsService {
   }
 
   private handleError(error: any) {
-    if (error.code === 11000) throw new BadRequestException(`Pokemon with ${JSON.stringify(error.keyValue)} has already exist`);
+    if (error.code === 11000) throw new BadRequestException(`Product with ${JSON.stringify(error.keyValue)} has already exist`);
 
     if (error instanceof HttpException) throw error;
     throw new InternalServerErrorException('Check server logs')

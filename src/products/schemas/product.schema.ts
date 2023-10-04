@@ -1,14 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Schema as SchemaModel } from 'mongoose';
 
-import { HydratedDocument } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
+
+import { Category } from 'src/categories/schemas/category.schema';
 
 export type ProductDocument = HydratedDocument<Product>
 
 @Schema({ timestamps: true })
 export class Product {
 
-    readonly _id: String;    
+    readonly _id: String;
 
     @Prop({
         type: String,
@@ -29,18 +31,25 @@ export class Product {
     })
     price: Number;
 
-     @Prop({
+    @Prop({
         type: Number,
         required: true,
         default: 0
-     })
-     stock: Number;
+    })
+    stock: Number;
 
-     @Prop({
+    @Prop({
+        type: [{ type: SchemaModel.Types.ObjectId, ref: 'categories' }],
+        required: true,
+        default: []
+    })
+    tags: Array<Category>
+
+    @Prop({
         type: Boolean,
         default: true,
-     })
-     status: Boolean;
+    })
+    status: Boolean;
 
 }
 

@@ -33,6 +33,7 @@ export class AuthService {
       }
 
     } catch (error) {
+      console.log(error)
       this.handleError(error);
     }
   }

@@ -32,11 +32,6 @@ export class User {
         type: String,
     })
     password: string;
-
-    @Prop({
-        type: [{ type: SchemaModel.Types.ObjectId, ref: 'Tags' }],
-        default: []
-    })
     tags: Array<String>
 
     @Prop({    
