@@ -18,11 +18,16 @@ export class ProductsController {
     return this.productsService.findAll(paginationDto);
   }
 
+  @Get('disable')
+  findAllTrashed() {
+    return this.productsService.getAllTrashedProducts();
+  }
+  
   @Get(':query')
   findOne(@Param('query') query: string) {
     return this.productsService.findOne(query);
   }
-
+  
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
@@ -32,4 +37,6 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
+
+
 }

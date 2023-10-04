@@ -6,8 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EnvConfiguration } from './config/env.config';
 import { userPreSave, userGetWithOutPassword } from './auth/hooks/';
 import { ProductsModule } from './products/products.module';
-import { createProductSlug } from './products/hooks/create-product-slug.hook';
-import { updateProductSlug } from './products/hooks/update-product-slug.hook';
+import { createProductSlug, updateProductSlug } from './products/hooks/';
 
 @Module({
   imports: [ 

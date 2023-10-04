@@ -5,8 +5,7 @@ import { PaginateModel, isValidObjectId } from 'mongoose';
 
 import { Product } from './schemas/product.schema';
 
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto/';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 @Injectable()
 export class ProductsService {
@@ -47,15 +46,27 @@ export class ProductsService {
     }
   }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    try {
+      return await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
+    } catch (error) {
+      this.handleError(error)
+    }
   }
 
   async remove(id: string) {
     try {
       return await this.update(id, { status: false });
     } catch (error) {
-      this.handleError(error)
+      this.handleError(error);
+    }
+  }
+
+  async getAllTrashedProducts() {
+    try {
+      return await this.productModel.paginate({ status: false });
+    } catch (error) {
+      this.handleError(error);
     }
   }
 
