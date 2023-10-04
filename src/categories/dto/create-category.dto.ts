@@ -11,4 +11,7 @@ export class CreateCategoryDto {
     @IsOptional()
     slug: string;
 
+    @IsOptional()
+    status?: boolean;
+
 }

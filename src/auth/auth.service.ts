@@ -61,7 +61,7 @@ export class AuthService {
   async createNewPassword( changePassowrdUserDto: ChangePasswordUserDto, { _id, password }: User ) {
     const { currentPassword, newPassword } = changePassowrdUserDto;
 
-    if (! this.verifyPassword(currentPassword, password) ) throw new BadRequestException('Invalid password - Verify your current password');
+    if ( !this.verifyPassword(currentPassword, password) ) throw new BadRequestException('Invalid password - Verify your current password');
 
     if( this.verifyPassword(newPassword, password) ) throw new BadRequestException('Please choose a different password');
 

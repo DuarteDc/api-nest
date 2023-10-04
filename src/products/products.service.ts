@@ -48,6 +48,7 @@ export class ProductsService {
 
   async update(id: string, updateProductDto: UpdateProductDto) {
     try {
+      await this.findOne(id);
       return await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true });
     } catch (error) {
       this.handleError(error)
@@ -56,6 +57,7 @@ export class ProductsService {
 
   async remove(id: string) {
     try {
+      await this.findOne(id);
       return await this.update(id, { status: false });
     } catch (error) {
       this.handleError(error);

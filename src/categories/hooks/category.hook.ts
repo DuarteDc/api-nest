@@ -12,7 +12,7 @@ export const categoryHook = () => ({
             const category = this.getUpdate() as Category;
             if (category?.name) {
                 category.name = category.name.trim();
-                category.slug = category.name.toLowerCase().replaceAll('', '-').replaceAll("'", '-')
+                category.slug = category.name.toLowerCase().replaceAll(' ', '-').replaceAll("'", '');
             }
         });
 
