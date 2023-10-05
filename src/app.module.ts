@@ -22,8 +22,8 @@ import { CategoriesModule } from './categories/categories.module';
 
     
     AuthModule,
+    CategoriesModule,
     ProductsModule,
-    CategoriesModule
   ],
 })
 

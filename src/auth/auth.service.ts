@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
@@ -7,10 +7,12 @@ import { compareSync, hashSync } from 'bcrypt';
 
 import { User } from './schemas/user.schema';
 
-import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto } from './dto/';
+import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto, LoginGoogleUserDto } from './dto/';
 
 import { JWTPayload } from './interfaces/jwt-payload.interface';
 import { UpdatePassword } from './interfaces/update-password.interface';
+import { Request } from 'express';
+import { type TokenPayload } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -51,6 +53,26 @@ export class AuthService {
     }
   }
 
+  async singInByGoogle({ headers }: Request) {
+    const { given_name, family_name, email } = JSON.parse(JSON.stringify(headers.userGoogle)) as TokenPayload;
+    try {
+      let user = await this.findOne(email);
+      if (!user) {
+        user = await this.userModel.create({ name: given_name, lastName: family_name, email})
+        return {
+          user,
+          token: this.generateJWT({ id: user.id })
+        }
+      }
+      return {
+        user,
+        token: this.generateJWT({ id: user.id })
+      }
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   async checkAuthentication(user: User) {
     return {
       user,
@@ -58,12 +80,12 @@ export class AuthService {
     }
   }
 
-  async createNewPassword( changePassowrdUserDto: ChangePasswordUserDto, { _id, password }: User ) {
+  async createNewPassword(changePassowrdUserDto: ChangePasswordUserDto, { _id, password }: User) {
     const { currentPassword, newPassword } = changePassowrdUserDto;
 
-    if ( !this.verifyPassword(currentPassword, password) ) throw new BadRequestException('Invalid password - Verify your current password');
+    if (!this.verifyPassword(currentPassword, password)) throw new BadRequestException('Invalid password - Verify your current password');
 
-    if( this.verifyPassword(newPassword, password) ) throw new BadRequestException('Please choose a different password');
+    if (this.verifyPassword(newPassword, password)) throw new BadRequestException('Please choose a different password');
 
     return await this.updateOne<String, UpdatePassword>(_id, { password: this.getHashPassword(newPassword) });
   }
@@ -77,9 +99,9 @@ export class AuthService {
   }
 
   private async updateOne<String, T>(_id: String, updated: T) {
-    try{
+    try {
       return await this.userModel.findOneAndUpdate({ _id }, updated, { new: true });
-    }catch(error) {
+    } catch (error) {
       this.handleError(error);
     }
   }

@@ -1,15 +1,18 @@
 import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+
+import { PaginateModel } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PaginateModel } from 'mongoose';
+
 import { Category } from './schemas/category.schema';
+
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+
 
 @Injectable()
 export class CategoriesService {
 
-  constructor(@InjectModel(Category.name) private readonly categoryModel: PaginateModel<Category>) { }
+  constructor( @InjectModel(Category.name) private readonly categoryModel: PaginateModel<Category> ) { }
 
   async create(createCategoryDto: CreateCategoryDto) {
     try {
