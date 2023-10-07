@@ -23,7 +23,7 @@ export class ProductsService {
   async findAll(paginationDto: PaginationDto) {
     try {
       const options = JSON.parse(JSON.stringify(paginationDto));
-      return await this.productModel.paginate({ status: true }, options)
+      return await this.productModel.find({ status: true }, options)
     } catch (error) {
       this.handleError(error);
     }

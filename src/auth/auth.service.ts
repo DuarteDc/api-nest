@@ -1,18 +1,18 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { Request } from 'express';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
+import { type TokenPayload } from 'google-auth-library';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 
 import { User } from './schemas/user.schema';
 
-import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto, LoginGoogleUserDto } from './dto/';
+import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto } from './dto/';
 
 import { JWTPayload } from './interfaces/jwt-payload.interface';
 import { UpdatePassword } from './interfaces/update-password.interface';
-import { Request } from 'express';
-import { type TokenPayload } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
@@ -54,23 +54,18 @@ export class AuthService {
   }
 
   async singInByGoogle({ headers }: Request) {
-    const { given_name, family_name, email } = JSON.parse(JSON.stringify(headers.userGoogle)) as TokenPayload;
+    const { given_name, family_name, email, } = JSON.parse(JSON.stringify(headers.userGoogle)) as TokenPayload;
+
     try {
       let user = await this.findOne(email);
-      if (!user) {
-        user = await this.userModel.create({ name: given_name, lastName: family_name, email})
-        return {
-          user,
-          token: this.generateJWT({ id: user.id })
-        }
-      }
-      return {
-        user,
-        token: this.generateJWT({ id: user.id })
-      }
+      if (user) return { user, token: this.generateJWT({ id: user.id }) }
+
+      user = await this.userModel.create({ name: given_name, lastName: family_name, email });
+      return { user, token: this.generateJWT({ id: user.id }) }
     } catch (error) {
       this.handleError(error);
     }
+
   }
 
   async checkAuthentication(user: User) {
@@ -111,6 +106,7 @@ export class AuthService {
   }
 
   private handleError(error: any) {
+    console.log(error)
     if (error instanceof HttpException) throw error;
     throw new InternalServerErrorException('Error please check server logs');
   }
