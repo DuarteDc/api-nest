@@ -1,6 +1,5 @@
 import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
-import { Schema as SchemaModel, HydratedDocument } from 'mongoose';
-
+import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>
 
@@ -39,6 +38,7 @@ export class User {
         default: true,
     })
     status: boolean;
+
 }
 
 

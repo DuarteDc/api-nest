@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { AuthService } from './auth.service';
 
-import { LoginUserDto, RegisterUserDto, ChangePasswordUserDto, LoginGoogleUserDto } from './dto';
+import { LoginUserDto, RegisterUserDto, ChangePasswordUserDto, LoginGoogleUserDto, ResetPasswordUserDto } from './dto';
 
 import { User } from './schemas/user.schema';
 
@@ -42,6 +42,12 @@ export class AuthController {
   @UseGuards(AuthGuard())
   changePassword( @Body() changePassowrdUserDto: ChangePasswordUserDto, @GetUser() user: User ) {
     return this.authService.createNewPassword( changePassowrdUserDto, user )
+  }
+  
+  @Post('forgot-password')
+  @HttpCode(200)
+  forgotPassword( @Body() resetPasswordUserDto: ResetPasswordUserDto) {
+    return this.authService.resetPassword(resetPasswordUserDto)
   }
 
 }

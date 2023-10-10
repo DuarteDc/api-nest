@@ -7,19 +7,26 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-
-import { User, UserSchema } from './schemas/user.schema';
 import { JWTStrategy } from './strategies/jwt.strategy';
+
+import { User, UserSchema, Token, TokenSchema } from './schemas/';
+import { TokenService } from './token.service';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   controllers: [ AuthController ],
-  providers: [ AuthService, JWTStrategy ],
+  providers: [ AuthService, JWTStrategy, TokenService ],
   imports: [
     ConfigModule,
+    CommonModule,
     MongooseModule.forFeature([
       {
         name: User.name,
         schema: UserSchema
+      },
+      {
+        name: Token.name,
+        schema: TokenSchema
       }
     ]),
 

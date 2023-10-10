@@ -8,6 +8,7 @@ import { EnvConfiguration } from './config/env.config';
 import { getMongoHooks } from './common/hooks/common.hook'
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
 
@@ -23,6 +24,7 @@ import { CategoriesModule } from './categories/categories.module';
     
     AuthModule,
     CategoriesModule,
+    CommonModule,
     ProductsModule,
   ],
 })

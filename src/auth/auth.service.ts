@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, HttpException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model } from 'mongoose';
@@ -7,17 +7,18 @@ import { type TokenPayload } from 'google-auth-library';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 
-import { User } from './schemas/user.schema';
+import { User } from './schemas/';
 
-import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto } from './dto/';
+import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto, ResetPasswordUserDto } from './dto/';
 
 import { JWTPayload } from './interfaces/jwt-payload.interface';
 import { UpdatePassword } from './interfaces/update-password.interface';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>, private readonly jwtService: JwtService) { }
+  constructor(@InjectModel(User.name) private readonly userModel: Model<User>, @Inject(TokenService) private readonly tokenService: TokenService, private readonly jwtService: JwtService) { }
 
 
   async singUp(registerUserDto: RegisterUserDto) {
@@ -83,6 +84,17 @@ export class AuthService {
     if (this.verifyPassword(newPassword, password)) throw new BadRequestException('Please choose a different password');
 
     return await this.updateOne<String, UpdatePassword>(_id, { password: this.getHashPassword(newPassword) });
+  }
+
+  async resetPassword({ email }: ResetPasswordUserDto) {
+    try {
+      const user = await this.findOne(email);
+      if (!user) throw new BadRequestException('User not valid');
+      return await this.tokenService.create({ user_id: user._id })
+      
+    } catch (error) {
+      this.handleError(error)
+    }
   }
 
   private async findOne(email: String) {
