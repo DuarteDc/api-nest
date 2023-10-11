@@ -9,6 +9,7 @@ import { getMongoHooks } from './common/hooks/common.hook'
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CommonModule } from './common/common.module';
+import { MailingModule } from './mailing/mailing.module';
 
 @Module({
 
@@ -26,6 +27,7 @@ import { CommonModule } from './common/common.module';
     CategoriesModule,
     CommonModule,
     ProductsModule,
+    MailingModule,
   ],
 })
 
