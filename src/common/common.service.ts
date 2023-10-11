@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import moment, { tz } from 'moment-timezone';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class CommonService {
@@ -12,14 +12,12 @@ export class CommonService {
         this.timezone = configService.get('TIME_ZONE')
     }
 
-
     addMinutesToDate(minutes: number): NativeDate {
-        return tz(this.timezone).add(minutes, 'minutes').toDate();
+        return moment.tz(this.timezone).add(minutes, 'minutes').toDate();
     }
 
     verifyExpirationDate(date: NativeDate): boolean {
-        return moment(date) > tz(this.timezone)
-
+        return moment(date) > moment.tz(this.timezone);
     }
 
 }

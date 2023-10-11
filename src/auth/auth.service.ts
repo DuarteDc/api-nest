@@ -1,25 +1,24 @@
 import { Request } from 'express';
 import { BadRequestException, HttpException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-
 import { Model } from 'mongoose';
+
 import { type TokenPayload } from 'google-auth-library';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 
+import { TokenService } from './token.service';
 import { User } from './schemas/';
 
-import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto, ResetPasswordUserDto } from './dto/';
+import { RegisterUserDto, LoginUserDto, ChangePasswordUserDto, ResetPasswordUserDto, CreateNewPasswordDto, QueriesResetPasswordDto } from './dto/';
 
 import { JWTPayload } from './interfaces/jwt-payload.interface';
 import { UpdatePassword } from './interfaces/update-password.interface';
-import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthService {
 
   constructor(@InjectModel(User.name) private readonly userModel: Model<User>, @Inject(TokenService) private readonly tokenService: TokenService, private readonly jwtService: JwtService) { }
-
 
   async singUp(registerUserDto: RegisterUserDto) {
     try {
@@ -91,10 +90,21 @@ export class AuthService {
       const user = await this.findOne(email);
       if (!user) throw new BadRequestException('User not valid');
       return await this.tokenService.create({ user_id: user._id })
-      
     } catch (error) {
       this.handleError(error)
     }
+  }
+
+  async changePassword({ confirm_passowrd, password }: CreateNewPasswordDto, { token, user_id }: QueriesResetPasswordDto) {
+
+    try {
+      if (confirm_passowrd !== password) throw new BadRequestException('Passwords do not coincide');
+      await this.tokenService.verifyTokenExpiration(user_id, token);
+      return await this.updateOne<String, UpdatePassword>(user_id, { password: this.getHashPassword(password) });      
+    } catch (error) {
+      this.handleError(error)
+    }
+
   }
 
   private async findOne(email: String) {

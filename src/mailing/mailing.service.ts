@@ -12,13 +12,18 @@ export class MailingService {
     }
 
      async sendMail() {
+      try {
         const resend = new Resend(this.configService.get('RESEND_SECRET_KEY'));
-        resend.emails.send({
-            from: 'xd@xdxd.com',
+        
+        await resend.emails.send({
+            from: 'al221910409@gmail.com',
             to: 'duartedc17@gmail.com',
             subject: 'xD',
             html: '<p>example</p>'
         })
+      } catch (error) {
+        console.log(error)
+      }
     }
 
 }
