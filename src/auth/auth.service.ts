@@ -35,7 +35,6 @@ export class AuthService {
       }
 
     } catch (error) {
-      console.log(error)
       this.handleError(error);
     }
   }
@@ -65,7 +64,6 @@ export class AuthService {
     } catch (error) {
       this.handleError(error);
     }
-
   }
 
   async checkAuthentication(user: User) {
@@ -88,8 +86,11 @@ export class AuthService {
   async resetPassword({ email }: ResetPasswordUserDto) {
     try {
       const user = await this.findOne(email);
-      if (!user) throw new BadRequestException('User not valid');
-      return await this.tokenService.create({ user_id: user._id })
+      if (!user) throw new BadRequestException('El correo electrónico no es valido');
+      await this.tokenService.create({ user_id: user._id })
+      return {
+        message: "Hemos enviado un correo con las instrucciones para recuperar tu cuenta"
+      }
     } catch (error) {
       this.handleError(error)
     }

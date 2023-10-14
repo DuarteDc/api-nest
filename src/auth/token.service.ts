@@ -2,7 +2,6 @@ import { BadRequestException, HttpException, Inject, Injectable, InternalServerE
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-
 import { Token } from './schemas';
 
 import { CreateTokenDto } from './dto';
@@ -15,7 +14,7 @@ export class TokenService {
     constructor(@InjectModel(Token.name) private readonly tokenModel: Model<Token>, @Inject(CommonService) private readonly commonService: CommonService) { }
 
     generateToken() {
-        return Token.generateToken()
+        return Token.generateToken();
     }
 
     async create({ user_id }: CreateTokenDto) {
