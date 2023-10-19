@@ -35,7 +35,7 @@ export class AuthService {
       }
 
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error);    
     }
   }
 

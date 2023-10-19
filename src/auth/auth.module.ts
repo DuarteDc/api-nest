@@ -48,6 +48,6 @@ import { CommonModule } from 'src/common/common.module';
 
   ],
 
-  exports: [ MongooseModule, JWTStrategy, PassportModule, JwtModule ]
+  exports: [ MongooseModule, JWTStrategy, PassportModule, JwtModule, AuthService ]
 })
 export class AuthModule {}

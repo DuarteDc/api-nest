@@ -10,6 +10,8 @@ import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CommonModule } from './common/common.module';
 import { MailingModule } from './mailing/mailing.module';
+import { CartModule } from './cart/cart.module';
+import { UserModule } from './user/user.module';
 
 @Module({
 
@@ -28,6 +30,8 @@ import { MailingModule } from './mailing/mailing.module';
     CommonModule,
     ProductsModule,
     MailingModule,
+    CartModule,
+    UserModule,
   ],
 })
 

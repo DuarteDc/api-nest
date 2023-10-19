@@ -19,7 +19,7 @@ export class TokenService {
 
     async create({ user_id }: CreateTokenDto) {
         try {
-            const  token = await this.findOne({ user_id });
+            const token = await this.findOne({ user_id });
             if (token) await this.delete(token.token);
             return await this.tokenModel.create({ user_id, token: this.generateToken(), expiration_date: this.commonService.addMinutesToDate(5) });
         } catch (error) {
