@@ -8,6 +8,7 @@ import { User, UserSchema } from 'src/auth/schemas';
 
 import { UserModule } from 'src/user/user.module';
 import { ProductsModule } from 'src/products/products.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   controllers: [ CartController ],
@@ -15,6 +16,7 @@ import { ProductsModule } from 'src/products/products.module';
   imports: [
     UserModule,
     ProductsModule,
+    AuthModule,
     MongooseModule.forFeature([
       {
         name: Cart.name,

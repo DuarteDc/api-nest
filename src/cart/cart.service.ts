@@ -5,19 +5,18 @@ import { Model } from 'mongoose';
 import { Cart } from './schemas/cart.schema';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UserService } from 'src/user/user.service';
-import { ProductCart } from './interfaces/product-cart.interface';
 import { ProductsService } from 'src/products/products.service';
 
 import { AddProductToCartDto } from './dto';
+import { User } from 'src/auth/schemas';
 
 @Injectable()
 export class CartService {
 
   constructor(@InjectModel(Cart.name) private readonly cartModel: Model<Cart>, @Inject(UserService) private readonly userService: UserService, @Inject(ProductsService) private readonly productService: ProductsService) { }
 
-  async create(userId: string, createCartDto: CreateCartDto) {
+  async create(createCartDto: CreateCartDto) {
     try {
-      await this.userService.findOne(userId);
       await this.cartModel.create(createCartDto);
       return {
         message: 'Producto agregado con exito',
@@ -27,34 +26,36 @@ export class CartService {
     }
   }
 
-  findOne(user_id: string) {
+  async findOne(user_id: string) {
     try {
-      return this.cartModel.findOne({ user_id });
+      return await this.cartModel.findOne({ user_id });
     } catch (error) {
       this.handleError(error);
+    }
+  }
+
+  async clearCart(userId: string) {
+    try {
+      const cart = await this.findOne(userId);
+      if ( !cart ) throw new BadRequestException('El carrito esta vacio');
+      await this.cartModel.updateOne({ _id: cart._id }, [ { $unset: ['products'] } ]);
+      return { message : 'El carrito se ha vaciado completamente '}
+    } catch (error) {
+      
     }
   }
 
   async addProductToCart (userId: string, addProductToCartDto: AddProductToCartDto) {
     try {
       const cart = await this.findOne(userId);
-      if ( !cart ) return await this.create(userId, { user_id: userId, products: [ addProductToCartDto ] });
+      if ( !cart ) return await this.create({ user_id: userId, products: [ addProductToCartDto ] });
 
-      const product = await this.validateNewProduct(cart, addProductToCartDto);
-      await this.update(cart._id.toString(), product);
+      await this.validateNewProduct(cart, addProductToCartDto);
       return {
         message: 'Producto agregado con exito',
       }
     } catch (error) {
       this.handleError(error);
-    }
-  }
-
-  async update(id: string, addProductToCartDto: AddProductToCartDto) {
-    try {
-      return await this.cartModel.updateOne({ _id: id }, { $set: { 'products.$[product].quantity': addProductToCartDto.quantity } }, { arrayFilters: [{ 'product.product_id': { $eq: addProductToCartDto.product_id } }]} );
-    } catch (error) {
-      this.handleError(error)
     }
   }
 
@@ -66,28 +67,35 @@ export class CartService {
     if (existProductInCart) {
       const newQuantity = existProductInCart.quantity + addProductToCartDto.quantity;
       if ( newQuantity > product.stock ) throw new BadRequestException('El producto no cuenta con el stock suficiente'); 
-      return {
-        quantity: newQuantity,
-        product_id: product._id,
-      }
+      return await this.updateProduct(cart._id, { quantity: newQuantity, product_id: addProductToCartDto.product_id })
     } 
     if ( addProductToCartDto.quantity > product.stock ) throw new BadRequestException('El producto no cuenta con el stock suficiente'); 
-    return  addProductToCartDto;
+    return  await this.addProduct(cart._id, addProductToCartDto)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
-  }
-
-  private async verifyProductStock(products: Array<ProductCart>) {
+  private async addProduct(id: string, addProductToCartDto: AddProductToCartDto) {
     try {
-      await Promise.all(products.map(async ({ product_id, quantity }) => {
-        const product = await this.productService.findOne(product_id);
-        if ( product.stock < quantity ) throw new BadRequestException(`El producto ${ product.name } no tiene stock suficiente`);
-      }));
+      return await this.cartModel.updateOne({ _id: id }, { $push: { products: addProductToCartDto }});
     } catch (error) {
       this.handleError(error)
     }
+  }
+  
+
+  private async updateProduct(id: string, addProductToCartDto: AddProductToCartDto) {
+    try {
+      return await this.cartModel.updateOne({ _id: id }, { $set: { 'products.$[product].quantity': addProductToCartDto.quantity } }, { arrayFilters: [{ 'product.product_id': { $eq: addProductToCartDto.product_id } }]} );
+    } catch (error) {
+      this.handleError(error)
+    }
+  }
+
+  async remove(productId: string, user: User) {
+      const cart = await this.findOne(user._id);
+      await this.cartModel.updateOne({ _id: cart._id }, { $pull: {  products: { product_id: productId  } }})
+      return {
+        message: 'El producto se ha eliminado correctamente'
+      }
   }
 
   private handleError(error: any) {

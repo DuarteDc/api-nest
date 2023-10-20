@@ -6,6 +6,8 @@ import { ProductCart } from '../interfaces/product-cart.interface';
 @Schema({ timestamps: true })
 export class Cart {
 
+    readonly _id: string;
+
     @Prop({
         type: SchemaModel.Types.ObjectId, ref: 'user',
         unique: true,

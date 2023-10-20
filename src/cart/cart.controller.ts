@@ -1,40 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { AddProductToCartDto } from './dto';
+import { User as GetUser } from 'src/auth/decorators/user.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/auth/schemas';
 
+@UseGuards(AuthGuard())
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) { }
 
-  // @Post()
-  // create(@Body() addProductToCartDto: AddProductToCartDto) {
-  //   return this.cartService.create(addProductToCartDto);
-  // }
-
-  @Post('/add/:user_id')
-  addProduct(@Param('user_id') user_id: string, @Body() addProductToCartDto: AddProductToCartDto) {
-    return this.cartService.addProductToCart(user_id, addProductToCartDto)
+  @Post('/add/')
+  addProduct(@GetUser() user: User, @Body() addProductToCartDto: AddProductToCartDto) {
+    return this.cartService.addProductToCart(user._id, addProductToCartDto)
   }
 
   @Get()
-  findAll() {
-    return ''
+  findOne(@GetUser() user: User) {
+    return this.cartService.findOne(user._id);
   }
 
-  @Get(':user_id')
-  findOne(@Param('user_id') user_id: string) {
-    return this.cartService.findOne(user_id);
+  @Delete('/clear')
+  removeProductsInCart(@GetUser() user: User ) {
+    return this.cartService.clearCart(user._id);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-  //   return this.cartService.update(id, updateCartDto);
-  // }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  remove(@Param('id') id: string, @GetUser() user: User ) {
+    return this.cartService.remove(id, user);
   }
 }
