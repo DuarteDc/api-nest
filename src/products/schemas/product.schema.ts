@@ -10,33 +10,33 @@ export type ProductDocument = HydratedDocument<Product>
 @Schema({ timestamps: true })
 export class Product {
 
-    readonly _id: String;
+    readonly _id: string;
 
     @Prop({
         type: String,
         required: true,
     })
-    name: String;
+    name: string;
 
     @Prop({
         type: String,
         required: false,
         unique: true,
     })
-    slug: String;
+    slug: string;
 
     @Prop({
         type: Number,
         required: true,
     })
-    price: Number;
+    price: number;
 
     @Prop({
         type: Number,
         required: true,
         default: 0
     })
-    stock: Number;
+    stock: number;
 
     @Prop({
         type: [{ type: SchemaModel.Types.ObjectId, ref: 'categories' }],
@@ -49,7 +49,7 @@ export class Product {
         type: Boolean,
         default: true,
     })
-    status: Boolean;
+    status: boolean;
 
 }
 

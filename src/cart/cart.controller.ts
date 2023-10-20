@@ -14,7 +14,7 @@ export class CartController {
 
   @Get()
   findAll() {
-    return this.cartService.findAll();
+    return ''
   }
 
   @Get(':user_id')
@@ -24,7 +24,7 @@ export class CartController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
+    return this.cartService.update(id, updateCartDto);
   }
 
   @Delete(':id')

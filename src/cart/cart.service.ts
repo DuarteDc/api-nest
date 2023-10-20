@@ -1,4 +1,4 @@
-import { HttpException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, HttpException, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -6,38 +6,51 @@ import { Cart } from './schemas/cart.schema';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { UserService } from 'src/user/user.service';
+import { ProductCart } from './interfaces/product-cart.interface';
+import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
 export class CartService {
 
-  constructor( @InjectModel( Cart.name ) private readonly cartModel: Model<Cart>, @Inject(UserService) private readonly userService: UserService ) { }
+  constructor(@InjectModel(Cart.name) private readonly cartModel: Model<Cart>, @Inject(UserService) private readonly userService: UserService, @Inject(ProductsService) private readonly productService: ProductsService) { }
 
-  async create({ user_id, products }: CreateCartDto) {
+  async create(createCartDto: CreateCartDto) {
     try {
+      await this.userService.findOne(createCartDto.user_id);
+      const cart = await this.findOne(createCartDto.user_id);
+      await this.verifyProductStock(createCartDto.products);
 
-       await this.userService.findOne(user_id);
-
-      return await this.cartModel.create({ user_id, products });
-      
+      return cart ? await this.update(cart._id.toString(), { products: createCartDto.products }) :  await this.cartModel.create(createCartDto);
     } catch (error) {
       this.handleError(error)
     }
   }
 
-  findAll() {
-    return `This action returns all cart`;
-  }
-
   findOne(user_id: string) {
-    return this.cartModel.findOne({ user_id });
+    try {
+      return this.cartModel.findOne({ user_id });
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
+  async update(id: string, { products }: UpdateCartDto) {
+    return await this.cartModel.updateOne({ _id: id }, products)
   }
 
   remove(id: number) {
     return `This action removes a #${id} cart`;
+  }
+
+  private async verifyProductStock(products: Array<ProductCart>) {
+    try {
+      await Promise.all(products.map(async ({ product_id, quantity }, index) => {
+        const product = await this.productService.findOne(product_id);
+        if ( product.stock < quantity ) throw new BadRequestException(`El producto ${ product.name } no tiene stock suficiente`);
+      }));
+    } catch (error) {
+      this.handleError(error)
+    }
   }
 
   private handleError(error: any) {

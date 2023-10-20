@@ -13,10 +13,12 @@ export class Cart {
     })
     user_id: string;
 
-    @Prop(raw({
-        product_id: { type: SchemaModel.Types.ObjectId, ref: 'product' },
-        quantity: { type: Number }
-    }))
+    @Prop([
+        {
+            product_id: { type: SchemaModel.Types.ObjectId, ref: 'products', unique: true },
+            quantity: { type: Number }
+        }
+    ])
     products: Array<ProductCart>;
 
 }

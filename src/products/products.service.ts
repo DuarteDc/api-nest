@@ -37,7 +37,7 @@ export class ProductsService {
       else
         product = await this.productModel.findOne({ slug: query });
 
-      if (!product) throw new NotFoundException(`${query} not found`)
+      if ( !product || !product.status ) throw new NotFoundException(`${query} not found`)
 
       return product;
 
