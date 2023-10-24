@@ -3,17 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Cart } from './schemas/cart.schema';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UserService } from 'src/user/user.service';
-import { ProductsService } from 'src/products/products.service';
-
-import { AddProductToCartDto } from './dto';
 import { User } from 'src/auth/schemas';
+
+import { ProductsService } from 'src/products/products.service';
+import { AddProductToCartDto, CreateCartDto } from './dto';
 
 @Injectable()
 export class CartService {
 
-  constructor(@InjectModel(Cart.name) private readonly cartModel: Model<Cart>, @Inject(UserService) private readonly userService: UserService, @Inject(ProductsService) private readonly productService: ProductsService) { }
+  constructor(@InjectModel(Cart.name) private readonly cartModel: Model<Cart>, @Inject(ProductsService) private readonly productService: ProductsService) { }
 
   async create(createCartDto: CreateCartDto) {
     try {
@@ -41,7 +39,7 @@ export class CartService {
       await this.cartModel.updateOne({ _id: cart._id }, [ { $unset: ['products'] } ]);
       return { message : 'El carrito se ha vaciado completamente '}
     } catch (error) {
-      
+      this.handleError(error)
     }
   }
 
@@ -60,7 +58,6 @@ export class CartService {
   }
 
   private async validateNewProduct(cart: Cart, addProductToCartDto: AddProductToCartDto) {
-
     const product = await this.productService.findOne(addProductToCartDto.product_id);
     const existProductInCart = cart.products.find( p => p.product_id.toString() === product._id.toString() );
 
@@ -80,7 +77,6 @@ export class CartService {
       this.handleError(error)
     }
   }
-  
 
   private async updateProduct(id: string, addProductToCartDto: AddProductToCartDto) {
     try {
@@ -91,11 +87,15 @@ export class CartService {
   }
 
   async remove(productId: string, user: User) {
+    try{
       const cart = await this.findOne(user._id);
       await this.cartModel.updateOne({ _id: cart._id }, { $pull: {  products: { product_id: productId  } }})
       return {
         message: 'El producto se ha eliminado correctamente'
       }
+    }catch(error){
+      this.handleError(error)
+    }
   }
 
   private handleError(error: any) {

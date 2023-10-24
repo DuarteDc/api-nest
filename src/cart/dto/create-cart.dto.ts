@@ -1,7 +1,7 @@
 import { IsArray, IsMongoId, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class ProductCart {
+abstract class ProductCart {
     @IsMongoId()
     @IsString()
     product_id: string;
@@ -20,6 +20,6 @@ export class CreateCartDto {
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ProductCart)
-    products:  ProductCart[]
+    products:  Array<ProductCart>
 
 }

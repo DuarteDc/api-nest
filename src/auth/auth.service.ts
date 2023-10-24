@@ -97,10 +97,8 @@ export class AuthService {
   }
 
   async changePassword({ confirm_passowrd, password }: CreateNewPasswordDto, { token, user_id }: QueriesResetPasswordDto) {
-
     try {
       if (confirm_passowrd !== password) throw new BadRequestException('Passwords do not coincide');
-      await this.tokenService.verifyTokenExpiration(user_id, token);
       return await this.updateOne<String, UpdatePassword>(user_id, { password: this.getHashPassword(password) });      
     } catch (error) {
       this.handleError(error)

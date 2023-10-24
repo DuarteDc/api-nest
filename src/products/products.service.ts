@@ -72,6 +72,7 @@ export class ProductsService {
     }
   }
 
+  
   private handleError(error: any) {
     if (error.code === 11000) throw new BadRequestException(`Product with ${JSON.stringify(error.keyValue)} has already exist`);
 

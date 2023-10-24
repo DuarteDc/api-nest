@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
 
 import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { Request } from 'express';
 
 @Controller('products')
 export class ProductsController {
@@ -22,6 +23,11 @@ export class ProductsController {
   findAllTrashed() {
     return this.productsService.getAllTrashedProducts();
   }
+  @Get('searched')
+  findByCookies(@Req() request: Request) {
+    console.log(request.cookies);
+    return request.cookies
+  }
   
   @Get(':query')
   findOne(@Param('query') query: string) {
@@ -37,6 +43,4 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
-
-
 }

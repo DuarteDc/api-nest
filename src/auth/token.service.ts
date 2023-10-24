@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, Inject, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -27,12 +27,11 @@ export class TokenService {
         }
     }
 
-    async verifyTokenExpiration(user_id: string, token: string) {
+    async verifyTokenExpiration(token: string, expirationDate: Date) {
         try {
-            const existToken = await this.findOne({ user_id, token });
-            if ( !existToken || existToken.token !== token ) throw new BadRequestException('Token is not valid');
-            if( !this.commonService.verifyExpirationDate(existToken.expiration_date) ) throw new UnauthorizedException('Token has expired');
+            if( !this.commonService.verifyExpirationDate(expirationDate) ) return false;
             await this.delete(token);
+            return true;
         } catch (error) {
             this.handleError(error)
         }

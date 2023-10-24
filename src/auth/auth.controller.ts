@@ -2,15 +2,16 @@ import { Request } from 'express';
 
 import { Controller, Post, Body, Get, UseGuards, Req, HttpCode, Query } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { User as GetUser} from './decorators/user.decorator';
+import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 
 import { AuthService } from './auth.service';
 
 import { LoginUserDto, RegisterUserDto, ChangePasswordUserDto, ResetPasswordUserDto, CreateNewPasswordDto,  QueriesResetPasswordDto } from './dto';
 
 import { User } from './schemas/user.schema';
+import { ResetPasswordGuardTsGuard } from './guards/reset-password.guard.ts.guard';
 
-import { User as GetUser} from './decorators/user.decorator';
-import { GoogleOAuthGuard } from './guards/google-oauth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -53,6 +54,7 @@ export class AuthController {
 
   @Post('create-new-password')
   @HttpCode(200)
+  @UseGuards(ResetPasswordGuardTsGuard)
   createNewPassword( @Body() createNewPasswordDto: CreateNewPasswordDto, @Query() queriesResetPasswordDto: QueriesResetPasswordDto ) {
     return this.authService.changePassword(createNewPasswordDto,  queriesResetPasswordDto)
   }

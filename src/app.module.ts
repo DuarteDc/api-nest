@@ -12,6 +12,8 @@ import { CommonModule } from './common/common.module';
 import { MailingModule } from './mailing/mailing.module';
 import { CartModule } from './cart/cart.module';
 import { UserModule } from './user/user.module';
+import { OrdersModule } from './orders/orders.module';
+import { PaymentGatewayModule } from './payment-gateway/payment-gateway.module';
 
 @Module({
 
@@ -32,6 +34,8 @@ import { UserModule } from './user/user.module';
     MailingModule,
     CartModule,
     UserModule,
+    OrdersModule,
+    PaymentGatewayModule,
   ],
 })
 

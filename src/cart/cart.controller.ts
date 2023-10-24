@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { CartService } from './cart.service';
-import { AddProductToCartDto } from './dto';
-import { User as GetUser } from 'src/auth/decorators/user.decorator';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
+import { CartService } from './cart.service';
+
+import { User as GetUser } from 'src/auth/decorators/user.decorator';
+
+import { AddProductToCartDto } from './dto';
 import { User } from 'src/auth/schemas';
 
 @UseGuards(AuthGuard())

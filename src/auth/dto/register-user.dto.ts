@@ -8,7 +8,7 @@ export class RegisterUserDto {
 
     @IsString()
     @MinLength(1)
-    lastName: string;
+    last_name: string;
 
     @IsString()
     @IsEmail()

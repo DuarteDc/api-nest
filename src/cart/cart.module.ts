@@ -6,7 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Cart, CartSchema } from './schemas/cart.schema';
 import { User, UserSchema } from 'src/auth/schemas';
 
-import { UserModule } from 'src/user/user.module';
 import { ProductsModule } from 'src/products/products.module';
 import { AuthModule } from 'src/auth/auth.module';
 
@@ -14,7 +13,6 @@ import { AuthModule } from 'src/auth/auth.module';
   controllers: [ CartController ],
   providers: [ CartService ],
   imports: [
-    UserModule,
     ProductsModule,
     AuthModule,
     MongooseModule.forFeature([

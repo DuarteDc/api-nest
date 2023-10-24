@@ -17,8 +17,8 @@ export class GoogleOAuthGuard implements CanActivate {
 
     try {
       const ticket = await this.client.verifyIdToken({
-        idToken: headers['authorization-google-token'],
-        audience: this.configService.get('GOOGLE_CLIENT_ID'),
+        idToken   : headers['authorization-google-token'],
+        audience  : this.configService.get('GOOGLE_CLIENT_ID'),
       })
 
       const payload = ticket.getPayload();
