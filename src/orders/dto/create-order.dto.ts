@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsMongoId, IsNumber, IsOptional, IsPositive, IsString, MinLength, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsIn, IsMongoId, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from 'class-validator';
 import { CreateProductDto } from 'src/products/dto';
+import { OrderStatus } from '../interfaces/order-status.interface';
 
 export abstract class OrderProduct extends CreateProductDto {
 
@@ -18,6 +19,10 @@ export class CreateOrderDto {
     @IsMongoId()
     @IsString()
     user_id: string;
+
+    @IsNumber()
+    @IsEnum(OrderStatus)
+    order_status: number;
 
     address: object;
 

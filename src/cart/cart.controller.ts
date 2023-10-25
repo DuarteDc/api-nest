@@ -8,8 +8,8 @@ import { User as GetUser } from 'src/auth/decorators/user.decorator';
 import { AddProductToCartDto } from './dto';
 import { User } from 'src/auth/schemas';
 
-@UseGuards(AuthGuard())
 @Controller('cart')
+@UseGuards(AuthGuard())
 export class CartController {
   constructor(private readonly cartService: CartService) { }
 

@@ -3,8 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 import * as mongoosePaginate from 'mongoose-paginate-v2';
 
-import { OrderProduct } from '../interfaces/order-product.interface';
-
+import type { OrderStatus, OrderProduct } from '../interfaces/';
 
 export type OrderDocument = HydratedDocument<Order>
 
@@ -28,6 +27,12 @@ export class Order {
         required: true,
     })
     products: Array<OrderProduct>
+
+    @Prop({
+        type: Number,
+        required: true
+    })
+    order_status: OrderStatus;
 
     @Prop({
         type: Number,

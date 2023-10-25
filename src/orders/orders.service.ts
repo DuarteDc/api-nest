@@ -17,7 +17,7 @@ export class OrdersService {
   async create({ products, ...order }: CreateOrderDto) {
     try {
       const successProducts = await this.validateProducts(products);
-      if ( !successProducts ) throw new BadRequestException('xd')
+      console.log(successProducts)
       return await this.orderModel.create({ products: successProducts, ...order });
     }catch(error) {
       this.handleError(error);
@@ -32,7 +32,7 @@ export class OrdersService {
 
 
   private async validateProducts(products: Array<OrderProduct>) {
-    let successProducts: Array<any>;
+    let successProducts = [];
     try {
       await Promise.all(products.map(async ({ _id, name, quantity }) => {
         const product = await this.productService.findOne(_id);
