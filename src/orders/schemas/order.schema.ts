@@ -35,6 +35,13 @@ export class Order {
     order_status: OrderStatus;
 
     @Prop({
+        type: Boolean,
+        default: false,
+        required: false,
+    })
+    status: boolean;
+
+    @Prop({
         type: Number,
         required: true,
     })

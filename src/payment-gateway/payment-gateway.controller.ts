@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Post, RawBodyRequest, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Headers, HttpCode, Post, RawBodyRequest, Req, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '@nestjs/passport';
 
@@ -14,7 +14,8 @@ export class PaymentGatewayController {
     constructor(private readonly paymentGatewayService: PaymentGatewayService) { }
 
     @Post()
-    createPaymentIntent(createPaymentIntentDto: CreatePaymentIntentDto, @GetUser() user: User) {
+    @HttpCode(200)
+    createPaymentIntent(@Body() createPaymentIntentDto: CreatePaymentIntentDto, @GetUser() user: User) {
         return this.paymentGatewayService.createPayment(createPaymentIntentDto, user)
     }
 

@@ -40,7 +40,7 @@ import { CommonModule } from 'src/common/common.module';
         return {
           secret: JWT_SECRET_KEY,
           signOptions: {
-            expiresIn: '2h'
+            expiresIn: '7d'
           }      
         }
       }

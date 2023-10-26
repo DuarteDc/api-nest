@@ -7,6 +7,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
     controllers: [ PaymentGatewayController ],
     providers: [ PaymentGatewayService  ],
-    imports: [ ConfigModule, AuthModule ]
+    imports: [ ConfigModule, AuthModule ],
+    exports: [ PaymentGatewayService ]
 })
 export class PaymentGatewayModule { }

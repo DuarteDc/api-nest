@@ -8,17 +8,19 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 
 import { Order } from './schemas/order.schema';
 import { ProductsService } from 'src/products/products.service';
+import { PaymentGatewayService } from 'src/payment-gateway/payment-gateway.service';
+import { User } from 'src/auth/schemas';
 
 @Injectable()
 export class OrdersService {
 
-  constructor(@InjectModel( Order.name ) private readonly orderModel: PaginateModel<Order>, @Inject( ProductsService ) private readonly productService: ProductsService) { }
+  constructor( @InjectModel(Order.name) private readonly orderModel: PaginateModel<Order>, @Inject( ProductsService ) private readonly productService: ProductsService, @Inject(PaymentGatewayService) private readonly paymentGatewayService: PaymentGatewayService ) { }
 
-  async create({ products, ...order }: CreateOrderDto) {
+  async create({ products, ...order }: CreateOrderDto, user: User) {
     try {
-      const successProducts = await this.validateProducts(products);
-      console.log(successProducts)
-      return await this.orderModel.create({ products: successProducts, ...order });
+      const successProducts = await this.validateProductsAndCalculateTotals(products);
+      const pendingOrder =  await this.orderModel.create({ products: successProducts, ...order });
+      return await this.paymentGatewayService.createPayment({ amount: 1000, order_id: pendingOrder._id.toString() }, user)
     }catch(error) {
       this.handleError(error);
     }
@@ -30,23 +32,17 @@ export class OrdersService {
 
   }
 
-
-  private async validateProducts(products: Array<OrderProduct>) {
-    let successProducts = [];
+  private async validateProductsAndCalculateTotals( products: Array<OrderProduct> ) {
+    let successProducts = [], totals = { };
     try {
       await Promise.all(products.map(async ({ _id, name, quantity }) => {
         const product = await this.productService.findOne(_id);
         if ( !product || !product.status ) throw new BadRequestException(`El producto ${name} no esta disponible`);
         if ( quantity > product.stock ) throw new BadRequestException(`El producto ${ name } no tiene suficiente stock`);
-
-        await this.productService.update(_id, { stock: product.stock - quantity });
-        successProducts.push({ _id, quantity, stock: product.stock, ...product  });
+        successProducts.push({ quantity, ...product });
       }));
       return successProducts;
     } catch (error) {
-      await Promise.all(successProducts.map(async ({ _id, quantity, stock }) => {
-        await this.productService.update(_id, { stock: stock + quantity })
-      }))
       this.handleError( error )
     }
   }
@@ -64,6 +60,15 @@ export class OrdersService {
     return `This action removes a #${id} order`;
   }
 
+  private validateProducts(product: OrderProduct, discount = 0) {
+    if (!product) return;
+    let subtotal =+ product.price * product.quantity;
+    const cashDiscount = (subtotal * discount) / 100;
+      return {
+        subtotal,
+        total: subtotal - cashDiscount,
+      }
+  }
 
   private handleError(error: any) {
     console.log(error);

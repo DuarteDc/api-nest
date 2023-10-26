@@ -1,8 +1,8 @@
-import { IsNumber, IsPositive, IsString } from 'class-validator';
+import { IsMongoId, IsNumber, IsPositive, IsString } from 'class-validator';
 
 export class CreatePaymentIntentDto {
 
-    @IsString()
+    @IsMongoId()
     order_id: string;
 
     @IsNumber()

@@ -8,12 +8,10 @@ import { User } from 'src/auth/schemas';
 export class PaymentGatewayService {
 
     private readonly stripe: Stripe;
-    private readonly secretEndpoint: string;
+    private readonly secretEndpoint: string;  
 
     constructor(configService: ConfigService) {
-        this.stripe = new Stripe(configService.get('STRIPE_SECRET_KEY'), {
-            apiVersion: '2023-10-16',
-        })
+        this.stripe = new Stripe(configService.get('STRIPE_SECRET_KEY'), { apiVersion: '2023-10-16' })
         this.secretEndpoint = configService.get('SECRET_ENDPOINT')
     }
 
@@ -28,12 +26,11 @@ export class PaymentGatewayService {
                     order_id
                 }
             });
-            return client_secret;
+            return { client_secret };
         } catch (error) {
             this.handleError(error)
         }
     }
-
 
     async confirmPayment(stripeSignature: string, rawBody: any) {
         let event: Stripe.Event;
